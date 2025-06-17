@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+
+    body{
+        width: 100vw;
+        height: 100vh;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient( hsl(273, 87%, 10%),hsl(273, 87%, 35%));
+        color: white;
+        font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
+    }
+
+    #container{
+        position: relative;
+        left:50%;
+        top: 50%;
+        gap:10px;
+        transform: translate(-50%, -50%);   
+        text-align: center;
+        justify-content: center;
+        width: 500px;
+        height: 700px;
+        max-width: 50vw;
+        max-height: 70vh;
+        padding: 10px;
+        background: linear-gradient( 30deg, #1bfdd8, #277bf8);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+    }
+
+    #searchbar{
+        height: 50px;
+        width: 85%;
+        border: none;
+        background: none;
+        padding: 0;
+        margin:0;
+        font-size: 24px;
+        color:white;
+        outline: none;
+    }
+
+    #searchbar::placeholder{
+        color: white;
+    }
+
+    #searchbutton{
+        background: none;
+        height: 40px;
+        width: 8%;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font-size: 30px;
+        padding-bottom: 44px;
+        padding-top: 10px;
+        color: white;
+        font-weight: none;
+    }
+
+    hr{
+        transform: translateY(-10px);
+    }
+
+    #weathericon{
+        max-width: 75%;
+    }
+    #weathericonname{
+        font-size: 24px;
+        margin-bottom: 100px;
+    }
+
+
+    
+
+    #container div{
+        display: inline-block;
+        margin: 10px;
+        font-size: 20px;
+    }
+
+    
+</style>
+<body>
+    <div id="container">
+        <input type="text" id="searchbar" placeholder="Search location" outocomplete="'off">
+        <button id="searchbutton"><i class="fa fa-search"></i></button>
+        <hr>
+        <img src="" alt="weather icon" id="weathericon">
+        <br>
+        <span id="weathericonname"></span>
+        <br>
+        <div id="temperature"></div>
+        <br>
+        <div id="location"></div>
+        <br>
+        <div >Feels like: </div>
+        <div id="feelslike"></div>
+        <br>
+        <div>Wind Speed: </div>
+        <div id="windspeed"></div>
+        <br>
+        <div>Humidity: </div>
+        <div id="humidity"></div>
+        
+    </div>
+</body>
+
+<script>
+    var searchbar = document.getElementById('searchbar')
+    var searchbutton = document.getElementById('searchbutton')
+    var tempdisplay = document.getElementById('temperature')
+    var locdisplay = document.getElementById('location')
+    var humiddisplay = document.getElementById('humidity')
+    var winddisplay = document.getElementById('windspeed')
+    var weathericon = document.getElementById('weathericon')
+    var weathericonname = document.getElementById('weathericonname')
+    var feels_like = document.getElementById('feelslike')
+    var pressure
+    var lat
+    var lon
+    var temp
+    var humidity
+    var wind
+    var feelslike
+
+
+    const sun = "./Sun.gif"
+    const rain = "./Cloud with rain.gif"
+    const sunwithrain = "./Sun behind rain cloud.gif"
+    const cloudy = "./Sun behind cloud.gif"
+    const storm = "./Cloud with lightning and rain.gif"
+    const snowflake = "./Cloud with snow"
+    
+    searchbar.addEventListener('change', searchlocation)
+    function searchlocation(){
+        
+        
+        fetchinfo(searchbar.value)
+        console.log('cass')
+    }
+
+
+    function iconsetter(weather){
+        if (weather == 'Clear'){
+            weathericon.src = sun
+        }
+        else if (weather == 'Rain'){
+            weathericon.src = rain
+        }
+        else if (weather == 'Clouds'){
+            weathericon.src = cloudy
+        }
+        else if (weather == 'Thunderstorm'){
+            weathericon.src = storm
+        }
+        else if (weather == 'Drizzle'){
+            weathericon.src = sunwithrain
+        }
+        else if(weather == 'snow'){
+            weathericon.src = snowflake
+        }
+
+    }
+
+
+    function toTitleCase(str) {
+        return str.toLowerCase().replace(/(?:^|\s)\S/g, char => char.toUpperCase());
+    }
+
+    function fetchinfo(city){
+        const APIKEY = '1703593e3de4aaac6d3d82b09007ea89'
+        
+        const URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIKEY}`
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET',URL)
+        xhr.send()
+        xhr.onload = ()=>{
+            const data = JSON.parse(xhr.response);
+            console.log(data);   
+            temp = data.main.temp - 273.15;
+            feelslike = data.main.feels_like - 273.15;
+            humidity = data.main.humidity;
+            wind = data.wind.speed;
+
+            weathericonname.innerHTML = toTitleCase(data.weather[0].description)
+            locdisplay.innerHTML = data.name;
+            temp = String(temp).slice(0,4)
+            feelslike = String(feelslike).slice(0,4)
+            tempdisplay.innerHTML = temp + "°C"
+            feels_like.innerHTML = feelslike + "°C"
+            humiddisplay.innerHTML = humidity + "%"
+            winddisplay.innerHTML = wind + " m/s"
+            var icon = data.weather[0].main;
+            iconsetter(icon)
+        }
+
+        
+
+        
+    }
+
+    fetchinfo('Jammu')
+    
+
+
+</script>
+</html>
